@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2019-11-23T21:32:26Z</date>
+    <groups>
+        <group>
+            <name>Templates/Services</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template Service Esendex</template>
+            <name>Template Service Esendex</name>
+            <groups>
+                <group>
+                    <name>Templates/Services</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Esendex</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Esendex credits Expiration</name>
+                    <type>DEPENDENT</type>
+                    <key>esendex[credits_expiration]</key>
+                    <delay>0</delay>
+                    <description>Retrieve expiration date for remaining Esendex credits</description>
+                    <applications>
+                        <application>
+                            <name>Esendex</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.PrepayCredits[0].Expirations[0].ExpiresAt</params>
+                        </step>
+                        <step>
+                            <type>JAVASCRIPT</type>
+                            <params>return (new Date(value).getTime()) / 1000</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>esendex[credits_infos]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{fuzzytime(2592000)}=1</expression>
+                            <name>Esendex Credits expires in 1 month</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                        <trigger>
+                            <expression>{fuzzytime(604800)}=1</expression>
+                            <name>Esendex Credits expires in 1 week</name>
+                            <priority>HIGH</priority>
+                        </trigger>
+                        <trigger>
+                            <expression>{fuzzytime(7776000)}=1</expression>
+                            <name>Esendex Credits expires in 3 months</name>
+                            <priority>INFO</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Esendex credits infos</name>
+                    <type>HTTP_AGENT</type>
+                    <key>esendex[credits_infos]</key>
+                    <delay>5m</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <authtype>BASIC</authtype>
+                    <username>{$ESENDEX_USERNAME}</username>
+                    <password>{$ESENDEX_PASSWORD}</password>
+                    <description>Retrieve credits informations as JSON, to be processed by dependent items</description>
+                    <applications>
+                        <application>
+                            <name>Esendex</name>
+                        </application>
+                    </applications>
+                    <url>https://admin.api.esendex.com/v1.0/credits</url>
+                    <query_fields>
+                        <query_field>
+                            <name>allocatedto</name>
+                            <value>{$ESENDEX_ACCOUNT}</value>
+                        </query_field>
+                    </query_fields>
+                </item>
+                <item>
+                    <name>Esendex credits quantity</name>
+                    <type>DEPENDENT</type>
+                    <key>esendex[credits_quantity]</key>
+                    <delay>0</delay>
+                    <description>Retrieve remaining Esendex credits</description>
+                    <applications>
+                        <application>
+                            <name>Esendex</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.PrepayCredits[0].Total</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>esendex[credits_infos]</key>
+                    </master_item>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;100</expression>
+                            <name>Esendex Credits lower than 100</name>
+                            <priority>HIGH</priority>
+                        </trigger>
+                        <trigger>
+                            <expression>{last()}&lt;200</expression>
+                            <name>Esendex Credits lower than 200</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                        <trigger>
+                            <expression>{last()}&lt;500</expression>
+                            <name>Esendex Credits lower than 500</name>
+                            <priority>INFO</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$ESENDEX_ACCOUNT}</macro>
+                </macro>
+                <macro>
+                    <macro>{$ESENDEX_PASSWORD}</macro>
+                </macro>
+                <macro>
+                    <macro>{$ESENDEX_USERNAME}</macro>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>
