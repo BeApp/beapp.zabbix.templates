@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-05-18T13:44:37Z</date>
+    <groups>
+        <group>
+            <name>Templates/Applications</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template App Git</template>
+            <name>Template App Git</name>
+            <description>Get information about a Git repository cloned on the host</description>
+            <groups>
+                <group>
+                    <name>Templates/Applications</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Git</name>
+                </application>
+                <application>
+                    <name>Project</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Project revision</name>
+                    <key>git.revision[&quot;{$REPOSITORY_PATH}&quot;]</key>
+                    <delay>1h</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <description>Current Git revision for the repository</description>
+                    <applications>
+                        <application>
+                            <name>Project</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                            <name>GIT: Project revision has changed</name>
+                            <priority>INFO</priority>
+                            <description>Project revision has changed</description>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Project status</name>
+                    <key>git.status[&quot;{$REPOSITORY_PATH}&quot;]</key>
+                    <delay>1h</delay>
+                    <history>7d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <description>Current Git status for the repository</description>
+                    <applications>
+                        <application>
+                            <name>Project</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{strlen()}&gt;0</expression>
+                            <name>GIT: Project repository is not cleaned</name>
+                            <priority>WARNING</priority>
+                            <description>Project repository is not cleaned</description>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{diff()}=1</expression>
+                            <name>GIT: Project repository status has changed</name>
+                            <priority>INFO</priority>
+                            <description>Current state of repository (status) has changed</description>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Git version</name>
+                    <key>git.version</key>
+                    <delay>1h</delay>
+                    <history>30d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <description>Version of Git service</description>
+                    <applications>
+                        <application>
+                            <name>Git</name>
+                        </application>
+                    </applications>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$REPOSITORY_PATH}</macro>
+                    <description>Path of the repository cloned on host</description>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>
