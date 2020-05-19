@@ -8,3 +8,5 @@ Zabbix template to monitor a specific Git repository cloned on a server.
 2. Apply template to an existing host or create a dummy one.
 3. Configure host's macros `{$GIT_REPOSITORY}`
 4. Deploy `userparameter_git.conf` on user-parameters folder (`/etc/zabbix/zabbix_agentd.d`) of host
+
+*Note:* Make sure tags are fetched on your repository : `git config remote.origin.tagopt --tags`

@@ -22,20 +22,20 @@
                     <name>Git</name>
                 </application>
                 <application>
-                    <name>Project</name>
+                    <name>Git repository</name>
                 </application>
             </applications>
             <items>
                 <item>
                     <name>Project revision</name>
                     <key>git.revision[&quot;{$REPOSITORY_PATH}&quot;]</key>
-                    <delay>1h</delay>
+                    <delay>10m</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <description>Current Git revision for the repository</description>
                     <applications>
                         <application>
-                            <name>Project</name>
+                            <name>Git repository</name>
                         </application>
                     </applications>
                     <triggers>
@@ -51,14 +51,14 @@
                 <item>
                     <name>Project status</name>
                     <key>git.status[&quot;{$REPOSITORY_PATH}&quot;]</key>
-                    <delay>1h</delay>
+                    <delay>10m</delay>
                     <history>7d</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <description>Current Git status for the repository</description>
                     <applications>
                         <application>
-                            <name>Project</name>
+                            <name>Git repository</name>
                         </application>
                     </applications>
                     <triggers>
