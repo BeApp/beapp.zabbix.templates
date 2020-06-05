@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-06-05T13:22:38Z</date>
+    <groups>
+        <group>
+            <name>Templates/Applications</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template App Filebeat</template>
+            <name>Template App Filebeat</name>
+            <description>Get information about Filebeat</description>
+            <groups>
+                <group>
+                    <name>Templates/Applications</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Filebeat</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Filebeat modules</name>
+                    <key>filebeat.modules</key>
+                    <delay>10m</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <description>Enabled modules for Filebeat instance</description>
+                    <applications>
+                        <application>
+                            <name>Filebeat</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JAVASCRIPT</type>
+                            <params>const regexp = /Enabled:\n([a-zA-Z0-9\n_-]*)\nDisabled/m
+const result = regexp.exec(value);
+if (result) {
+  return result[1];
+}
+return null;</params>
+                        </step>
+                    </preprocessing>
+                    <triggers>
+                        <trigger>
+                            <expression>{change()}=1</expression>
+                            <name>Filebeat modules was changed</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Filebeat version</name>
+                    <key>filebeat.version</key>
+                    <delay>10m</delay>
+                    <history>30d</history>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <applications>
+                        <application>
+                            <name>Filebeat</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{change()}=1</expression>
+                            <name>Filebeat version was changed</name>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Filebeat status</name>
+                    <key>proc.num[filebeat]</key>
+                    <applications>
+                        <application>
+                            <name>Filebeat</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last(#2)}=0</expression>
+                            <name>Filebeat is not running</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata(30m)}=1</expression>
+                            <name>Filebeat status is not resolvable</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+        </template>
+    </templates>
+</zabbix_export>
